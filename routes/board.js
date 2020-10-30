@@ -6,4 +6,9 @@ router.get(['/', 'list'], (req, res, next) => {
 	res.render('./board/list.pug', pug);
 });
 
+router.get(['/write', (req, res, next) => {
+	const pug = {title: '게시판 작성', js: 'board', css: 'board'}
+	res.render('./board/write.pug', pug);
+});
+
 module.exports = router;
