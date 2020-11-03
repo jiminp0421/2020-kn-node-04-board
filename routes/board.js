@@ -2,6 +2,7 @@ const express = require('express');
 const moment = require('moment');
 const router = express.Router();
 const { pool } = require('../modules/mysql-conn');
+const { alert } = require('../modules/util');
 
 router.get(['/', '/list'], async (req, res, next) => {
 	const pug = {title: '게시판 리스트', js: 'board', css: 'board'};
@@ -11,7 +12,7 @@ router.get(['/', '/list'], async (req, res, next) => {
 		const rs = await connect.query(sql);
 		pug.lists = rs[0];
 		pug.lists.forEach((v) => {
-			v.wdate = moment(v.wdate).format('YYYY-MM-DD');
+			v.wdate = moment(v.wdate).format('YYYY년 MM월 DD일');
 		});
 		connect.release();
 		res.render('./board/list.pug', pug);
@@ -28,7 +29,7 @@ router.get('/write', (req, res, next) => {
 
 router.post('/save', async (req, res, next) => {
 	const { title, content, writer } = req.body;
-	var values = [title, content, writer];
+	var values = [title, writer, content];
 	var sql = 'INSERT INTO board SET title=?, writer=?, content=?';
 	try {
 		const connect = await pool.getConnection();
@@ -41,8 +42,8 @@ router.post('/save', async (req, res, next) => {
 	}
 });
 
-router.get('/view/:id', async (req, res) => {
-	try{
+router.get('/view/:id', async (req, res, next) => {
+	try {
 		const pug = {title: '게시글 보기', js: 'board', css: 'board'};
 		const sql = "SELECT * FROM board WHERE id=?";
 		const values = [req.params.id];
@@ -52,6 +53,50 @@ router.get('/view/:id', async (req, res) => {
 		pug.list = rs[0][0];
 		pug.list.wdate = moment(pug.list.wdate).format('YYYY-MM-DD HH:mm:ss');
 		res.render('./board/view.pug', pug);
+	}
+	catch(e) {
+		next(e);
+	}
+});
+
+router.get('/delete/:id', async (req, res, next) => {
+	try {
+		const sql = "DELETE FROM board WHERE id=?";
+		const values = [req.params.id];
+		const connect = await pool.getConnection();
+		const rs = await connect.query(sql, values);
+		res.send(alert('삭제되었습니다', '/board'));
+	}
+	catch(e) {
+		next(e);
+	}
+});
+
+router.get('/update/:id', async (req, res, next) => {
+	try {
+		const pug = {title: '게시글 수정', js: 'board', css: 'board'};
+		const sql = "SELECT * FROM board WHERE id=?";
+		const values = [req.params.id];
+		const connect = await pool.getConnection();
+		const rs = await connect.query(sql, values);
+		connect.release();
+		pug.list = rs[0][0];
+		res.render('./board/write.pug', pug);
+	}
+	catch(e) {
+		next(e);
+	}
+});
+
+router.get('/saveUpdate', async (req, res, next) => {
+	const { id, title, writer, content } = req.body;
+	try {
+		const sql = "UPDATE baord SET title=?, writer=?, contetnt=? WHERE id=?";
+		const values = [title, writer, content, id];
+		const connect = await pool.getConnection();
+		const rs = await connect.query(sql, values);
+		if(rs[0].affectedRows == 1) res.send(alert('수정되었습니다', '/board'));
+		else res.send(alert('수정에 실패하였습니다.', '/board'));
 	}
 	catch(e) {
 		next(e);
