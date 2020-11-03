@@ -20,7 +20,7 @@ router.post('/save', async (req, res, next) => {
 		const connect = await pool.getConnection();
 		const rs = await connect.query(sql, values);
 		connect.release();
-		res.json(rs);
+		res.redirect('/board');
 	}
 	catch(err) {
 		next(err);
