@@ -88,13 +88,14 @@ router.get('/update/:id', async (req, res, next) => {
 	}
 });
 
-router.get('/saveUpdate', async (req, res, next) => {
+router.post('/saveUpdate', async (req, res, next) => {
 	const { id, title, writer, content } = req.body;
 	try {
-		const sql = "UPDATE baord SET title=?, writer=?, contetnt=? WHERE id=?";
+		const sql = "UPDATE board SET title=?, writer=?, content=? WHERE id=?";
 		const values = [title, writer, content, id];
 		const connect = await pool.getConnection();
 		const rs = await connect.query(sql, values);
+		connect.release();
 		if(rs[0].affectedRows == 1) res.send(alert('수정되었습니다', '/board'));
 		else res.send(alert('수정에 실패하였습니다.', '/board'));
 	}
