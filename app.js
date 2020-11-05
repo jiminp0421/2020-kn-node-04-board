@@ -3,9 +3,11 @@ require('dotenv').config();
 const express = require('express');
 const app = express();
 const path = require('path');
+const multer = require('multer');
+const { v4: uuidv4 } = require('uuid');
 
 /** modules ********************************/
-const { pool } = require('./modules/mysql-conn');
+const logger = require('./modules/morgan.conn');
 const boardRouter = require('./routes/board');
 const galleryRouter = require('./routes/gallery');
 
@@ -20,13 +22,24 @@ app.set('views', path.join(__dirname, './views'));
 app.locals.pretty = true;
 
 /** middleware ********************************/
+app.use(logger);
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
+const upload = multer({ dest: path.join(__dirname,'uploads/')});
 
 /** routers ********************************/
 app.use('/', express.static(path.join(__dirname, './public')));
 app.use('/board', boardRouter);
 app.use('/gallery', galleryRouter);
+
+app.get('/test/upload', (req, res, next) => {
+	res.render('test/upload');
+});
+
+app.post('/test/save', upload.single('upfile'), (req, res, next) => {
+	const { title, upfile } = req.body;
+	res.redirect('/board');
+});
 
 /** error ********************************/
 app.use((req, res, next) => {
