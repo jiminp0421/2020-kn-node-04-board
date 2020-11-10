@@ -23,6 +23,10 @@ app.locals.pretty = true;
 
 /** middleware ********************************/
 app.use(logger);
+app.use((req, res, next) => {
+	express.test = "aaa"
+	express.json()(req, res, next);
+})
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 
@@ -38,7 +42,7 @@ app.get('/test/upload', (req, res, next) => {
 });
 
 app.post('/test/save', upload.single("upfile"), (req, res, next) => {
-	res.json(req.body);
+	res.json(req.file);
 });
 
 
