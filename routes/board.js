@@ -68,7 +68,7 @@ router.get('/view/:id', async (req, res, next) => {
 		pug.list = rs[0][0];
 		pug.list.wdate = moment(pug.list.wdate).format('YYYY-MM-DD HH:mm:ss');
 		if(pug.list.savefile) {
-			var ext = Path.extname(pug.list.savefile).toLowerCase().replace(".", "")
+			var ext = path.extname(pug.list.savefile).toLowerCase().replace(".", "")
 			if(imgExt.indexOf(ext) > -1){
 				pug.list.imgSrc = `/storage/${pug.list.savefile.substr(0,6)}/${pug.list.savefile}`;
 			}
