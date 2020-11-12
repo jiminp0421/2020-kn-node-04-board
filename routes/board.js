@@ -29,7 +29,7 @@ router.get(['/', '/list'], async (req, res, next) => {
 });
 
 router.get('/write', (req, res, next) => {
-	const pug = {title: '게시글 노노노 작성', js: 'board', css: 'board'};
+	const pug = {title: '게시글 작성', js: 'board', css: 'board'};
 	res.render('./board/write.pug', pug);
 });
 
