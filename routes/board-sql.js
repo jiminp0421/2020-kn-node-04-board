@@ -4,22 +4,18 @@ const path = require('path');
 const fs = require('fs-extra');
 const createError = require('http-errors');
 const router = express.Router();
-const { pool, sqlGen } = require('../modules/mysql-conn');
+const { pool } = require('../modules/mysql-conn');
 const { alert, uploadFolder } = require('../modules/util');
 const { upload, imgExt } = require('../modules/multer-conn');
-
+const { connect } = require('http2');
 
 router.get(['/', '/list'], async (req, res, next) => {
 	let connect, rs, sql, values, pug;
 	pug = {title: '게시판 리스트', js: 'board', css: 'board'};
 	try {
-		let temp = sqlGen({
-			table: 'board',
-			mode: 'S',
-			desc: 'ORDER BY id DESC'
-		});
+		sql = 'SELECT * FROM board ORDER BY id DESC';
 		connect = await pool.getConnection();
-		rs = await connect.query(temp.sql);
+		rs = await connect.query(sql);
 		connect.release();
 		pug.lists = rs[0];
 		pug.lists.forEach((v) => {
