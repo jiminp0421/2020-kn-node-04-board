@@ -9,10 +9,10 @@ const pool = mysql.createPool({
 	connectionLimit: 10
 });
 
-const sqlGen = (obj) => {
-	let { mode=null, table=null, field=[], data={}, file=null, id=null, sql=null, values=[], desc=null } = obj;
+const sqlGen = (table, obj) => {
+	let {mode=null, field=[], data={}, file=null, id=null, desc=null} = obj;
+	let sql=null, values=[];
 	let temp = Object.entries(data).filter(v => field.includes(v[0]));
-	console.log(id);
 
 	switch(mode) {
 		case 'I':
@@ -42,13 +42,8 @@ const sqlGen = (obj) => {
 		values.push(file.originalname);
 	}
 	sql = sql.substr(0, sql.length - 1);
-
 	if(mode == 'I', mode == 'U') sql += ` WHERE id=${id}`;
-
-	console.log(sql, values);
-
-
-	//return { sql, values, sqlGen }
+	return { sql, values }
 }
 
-module.exports = { mysql, pool };
+module.exports = { mysql, pool, sqlGen };
