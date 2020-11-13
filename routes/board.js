@@ -36,7 +36,7 @@ router.get('/write', (req, res, next) => {
 router.post('/save', upload.single('upfile'), async (req, res, next) => {
 	let connect, rs;
 	try {
-		if(!req.allow) res.send(alert(`${req.ext}은(는) 업로드 할 수 없습니다.`, '/board'));
+		if(req.allow === false) res.send(alert(`${req.ext}은(는) 업로드 할 수 없습니다.`, '/board'));
 		else {
 			let temp = sqlGen('board', {
 				mode: 'I', 
@@ -117,7 +117,7 @@ router.get('/update/:id', async (req, res, next) => {
 router.post('/saveUpdate', upload.single('upfile'), async (req, res, next) => {
 	let connect, rs, temp;
 	try {
-		if(!req.allow) res.send(alert(`${req.ext}은(는) 업로드 할 수 없습니다.`, '/board'));
+		if(req.allow === false) res.send(alert(`${req.ext}은(는) 업로드 할 수 없습니다.`, '/board'));
 		else {
 			connect = await pool.getConnection();
 			if(req.file) {
@@ -127,8 +127,9 @@ router.post('/saveUpdate', upload.single('upfile'), async (req, res, next) => {
 			}
 			temp = sqlGen('board', {
 				mode: 'U', 
-				id: req.params.id, 
+				id: req.body.id, 
 				field: ['title', 'writer', 'content'],
+				data: req.body,
 				file: req.file
 			});
 			rs = await connect.query(temp.sql, temp.values);
@@ -148,12 +149,16 @@ router.get('/download', (req, res, next) => {
 });
 
 router.get('/fileRemove/:id', async (req, res, next) => {
-	let connect, rs, sql, values, list, pug;
+	let connect, rs, temp;
 	try {
-		sql = 'SELECT * FROM board WHERE id='+req.params.id;
 		connect = await pool.getConnection();
-		rs = await connect.query(sql);
+		temp = sqlGen('board', {mode: 'S', id: req.params.id, field: ['savefile']});
+		rs = await connect.query(temp.sql);
+		if(rs[0][0].savefile) await fs.remove(uploadFolder(saveFile));
 		connect.release();
+
+
+		
 		list = rs[0][0];
 		if(list.savefile) {
 			try {
