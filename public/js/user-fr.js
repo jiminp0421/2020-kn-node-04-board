@@ -36,3 +36,11 @@ function onJoin(f) {
 	}
 	return true;
 }
+
+function onLogin(f) {
+	if(f.userid.value.trim() == '' || f.userpw.value.trim() == '') {
+		alert('올바르게 기입해 주세요');
+		return false;
+	}
+	return true;
+}
