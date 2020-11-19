@@ -29,9 +29,10 @@ function onBlur() {
 
 $("form[name='joinForm'] input[name='userid']").on("blur", onBlur);
 
+
 function onJoin(f) {
 	if(f.useridValid.value.trim() == '' || f.userpw.value.trim() == '' || f.username.value.trim() == '') {
-		alert('올바르게 기입해 주세요');
+		alert('올바르게 기입해 주세요.');
 		return false;
 	}
 	return true;
@@ -39,7 +40,7 @@ function onJoin(f) {
 
 function onLogin(f) {
 	if(f.userid.value.trim() == '' || f.userpw.value.trim() == '') {
-		alert('올바르게 기입해 주세요');
+		alert('올바르게 기입해 주세요.');
 		return false;
 	}
 	return true;
